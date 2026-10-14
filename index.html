@@ -1,0 +1,1902 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="author" content="Mehrdad Rabiei">
+<meta name="description" content="BlueShade Register - سیستم مدیریت محصولات">
+<title>BlueShade Register</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
+<style>
+  :root {
+    --primary: #2563eb;
+    --primary-dark: #1e40af;
+    --primary-light: #60a5fa;
+    --success: #10b981;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --info: #06b6d4;
+    --dark: #1e293b;
+    --gray: #64748b;
+    --light: #f1f5f9;
+    --border: #e2e8f0;
+    --bg: #f0f4f8;
+    --card: #ffffff;
+    --text: #0f172a;
+    --shadow: 0 4px 16px rgba(0,0,0,0.08);
+    --shadow-lg: 0 10px 40px rgba(0,0,0,0.15);
+    --radius: 14px;
+    --radius-sm: 10px;
+    --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  body.dark {
+    --bg: #0f172a;
+    --card: #1e293b;
+    --light: #334155;
+    --border: #334155;
+    --text: #f1f5f9;
+    --gray: #94a3b8;
+    --shadow: 0 4px 16px rgba(0,0,0,0.4);
+  }
+
+  * { box-sizing: border-box; font-family: 'Vazirmatn', Tahoma, sans-serif; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; overflow-x: hidden; }
+  body {
+    background: var(--bg);
+    padding: 10px;
+    font-size: 14px;
+    min-height: 100vh;
+    color: var(--text);
+    transition: background 0.3s, color 0.3s;
+  }
+
+  /* ==== Header ==== */
+  .app-header {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 60%, #4c1d95 100%);
+    color: #fff;
+    padding: 18px 16px;
+    border-radius: var(--radius);
+    margin-bottom: 14px;
+    box-shadow: var(--shadow-lg);
+    position: relative;
+    overflow: hidden;
+  }
+  .app-header::before {
+    content: '';
+    position: absolute;
+    top: -50%; right: -20%;
+    width: 200px; height: 200px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 50%;
+  }
+  .app-header h1 {
+    margin: 0 0 4px;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    position: relative;
+  }
+  .app-header .subtitle {
+    margin: 0;
+    font-size: 12px;
+    opacity: 0.9;
+    position: relative;
+  }
+  .header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    position: relative;
+  }
+  .date-badge {
+    background: rgba(255,255,255,0.18);
+    backdrop-filter: blur(6px);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+  }
+  .theme-btn {
+    background: rgba(255,255,255,0.18);
+    border: none;
+    color: #fff;
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    font-size: 18px;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .theme-btn:hover { background: rgba(255,255,255,0.3); transform: scale(1.05); }
+
+  .developer-info {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255,255,255,0.2);
+    font-size: 11px;
+    opacity: 0.85;
+    position: relative;
+    line-height: 1.6;
+  }
+  .developer-info a { color: #fff; text-decoration: underline; }
+
+  /* ==== Container ==== */
+  .container {
+    max-width: 1200px;
+    margin: auto;
+    background: var(--card);
+    padding: 18px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    transition: background 0.3s;
+  }
+
+  h1.page-title {
+    text-align: center;
+    color: var(--primary);
+    margin: 0 0 18px;
+    font-size: 20px;
+    font-weight: 800;
+  }
+
+  /* ==== Menu ==== */
+  .main-menu {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+  }
+  .menu-btn {
+    padding: 18px 14px;
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: bold;
+    transition: var(--transition);
+    font-family: inherit;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    position: relative;
+    overflow: hidden;
+  }
+  .menu-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(255,255,255,0.15), transparent);
+    pointer-events: none;
+  }
+  .menu-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
+  .menu-btn:active { transform: scale(0.97); }
+  .menu-btn .icon { font-size: 26px; }
+  .b-manage { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
+  .b-add { background: linear-gradient(135deg, #10b981, #047857); }
+  .b-pdf { background: linear-gradient(135deg, #ef4444, #b91c1c); }
+  .b-catalog { background: linear-gradient(135deg, #ec4899, #be185d); }
+  .b-excel { background: linear-gradient(135deg, #22c55e, #15803d); }
+  .b-word { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+  .b-backup { background: linear-gradient(135deg, #f97316, #c2410c); }
+  .b-exit { background: linear-gradient(135deg, #6b7280, #374151); }
+
+  .page { display: none; }
+  .page.active { display: block; animation: fadeIn 0.25s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+  /* ==== Forms ==== */
+  .form-row { margin-bottom: 12px; }
+  .form-row label { display: block; margin-bottom: 6px; font-weight: bold; font-size: 13px; color: var(--text); }
+  .form-row input, .form-row textarea, .form-row select {
+    width: 100%; padding: 11px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 14px; font-family: inherit;
+    background: var(--card);
+    color: var(--text);
+    transition: var(--transition);
+  }
+  .form-row input:focus, .form-row select:focus, .form-row textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+  }
+
+  .btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+  button.btn {
+    padding: 11px 18px;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: bold;
+    font-family: inherit;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  button.btn:hover { transform: translateY(-2px); box-shadow: 0 6px 14px rgba(0,0,0,0.15); }
+  button.btn:active { transform: scale(0.97); }
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-success { background: var(--success); color: #fff; }
+  .btn-danger { background: var(--danger); color: #fff; }
+  .btn-warning { background: var(--warning); color: #fff; }
+  .btn-secondary { background: var(--gray); color: #fff; }
+  .btn-info { background: var(--info); color: #fff; }
+  .btn-back { background: #475569; color: #fff; }
+  .btn-orange { background: #f97316; color: #fff; }
+  .btn-pink { background: #ec4899; color: #fff; }
+  .btn-sm { padding: 6px 10px; font-size: 12px; }
+
+  /* ==== Search ==== */
+  .search-box {
+    position: relative;
+    margin-bottom: 12px;
+  }
+  .search-box input {
+    width: 100%;
+    padding: 12px 42px 12px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-family: inherit;
+    font-size: 14px;
+    background: var(--card);
+    color: var(--text);
+    transition: var(--transition);
+  }
+  .search-box input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+  }
+  .search-box .search-icon {
+    position: absolute;
+    right: 14px; top: 50%;
+    transform: translateY(-50%);
+    color: var(--gray);
+    font-size: 16px;
+    pointer-events: none;
+  }
+  .search-box .clear-btn {
+    position: absolute;
+    left: 8px; top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: var(--gray);
+    font-size: 18px;
+    cursor: pointer;
+    padding: 4px 8px;
+    display: none;
+  }
+  .search-box .clear-btn.visible { display: block; }
+
+  .search-result-info {
+    font-size: 12px;
+    color: var(--gray);
+    margin-bottom: 8px;
+    padding: 0 4px;
+  }
+
+  /* ==== Product List ==== */
+  .product-list {
+    max-height: 60vh;
+    overflow-y: auto;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--card);
+  }
+  .product-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    border-bottom: 1px solid var(--border);
+    transition: var(--transition);
+  }
+  .product-item:hover { background: var(--light); }
+  .product-item:last-child { border-bottom: none; }
+  .product-thumb {
+    width: 48px; height: 48px; border-radius: var(--radius-sm); object-fit: cover;
+    background: var(--light); border: 1px solid var(--border); flex-shrink: 0;
+  }
+  .product-thumb-empty {
+    width: 48px; height: 48px; border-radius: var(--radius-sm); background: var(--light);
+    border: 1px dashed var(--gray); display: flex; align-items: center; justify-content: center;
+    font-size: 20px; color: var(--gray); flex-shrink: 0;
+  }
+  .product-item .pname {
+    flex: 1; word-break: break-word; font-weight: 600; cursor: pointer;
+  }
+  .product-item .pname mark {
+    background: #fde68a;
+    color: #78350f;
+    padding: 0 2px;
+    border-radius: 3px;
+  }
+  body.dark .product-item .pname mark { background: #a16207; color: #fef3c7; }
+
+  /* ==== Filter box ==== */
+  .filter-box {
+    background: var(--light);
+    padding: 14px;
+    border-radius: var(--radius-sm);
+    margin-bottom: 12px;
+    border: 1px solid var(--border);
+  }
+  .filter-box h3 { margin: 0 0 10px; font-size: 13px; color: var(--primary); font-weight: 800; }
+  .filter-box label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 4px 10px 4px 0;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .filter-box input[type="checkbox"], .filter-box input[type="radio"] {
+    width: 18px; height: 18px; accent-color: var(--primary); cursor: pointer;
+  }
+
+  .product-check-list {
+    max-height: 220px; overflow-y: auto;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 8px;
+    background: var(--card);
+    margin-top: 8px;
+  }
+  .product-check-list label {
+    display: flex; padding: 8px; margin: 0; width: 100%; border-radius: 6px;
+    cursor: pointer;
+  }
+  .product-check-list label:hover { background: var(--light); }
+
+  /* ==== Modal ==== */
+  .modal {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.65);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    justify-content: center; align-items: center;
+    padding: 10px; overflow-y: auto;
+  }
+  .modal.active { display: flex; animation: fadeIn 0.2s; }
+  .modal-content {
+    background: var(--card);
+    padding: 20px;
+    border-radius: var(--radius);
+    width: 100%; max-width: 520px; max-height: 92vh; overflow-y: auto;
+    box-shadow: var(--shadow-lg);
+    color: var(--text);
+  }
+  .modal-content h3 { margin: 0 0 15px; font-size: 16px; color: var(--primary); }
+
+  .img-preview {
+    width: 100%; max-height: 200px; object-fit: contain;
+    background: var(--light); border-radius: var(--radius-sm); margin-bottom: 10px;
+  }
+
+  /* ==== Toast Notification ==== */
+  #toastContainer {
+    position: fixed;
+    top: 20px; left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    pointer-events: none;
+  }
+  .toast {
+    padding: 12px 20px;
+    border-radius: 10px;
+    color: #fff;
+    font-weight: bold;
+    font-size: 13px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    animation: slideDown 0.3s ease;
+    pointer-events: auto;
+    max-width: 90vw;
+    word-break: break-word;
+  }
+  .toast.success { background: linear-gradient(135deg, #10b981, #047857); }
+  .toast.error { background: linear-gradient(135deg, #ef4444, #b91c1c); }
+  .toast.info { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+  .toast.warning { background: linear-gradient(135deg, #f59e0b, #c2410c); }
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ==== Catalog preview ==== */
+  .catalog-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 8px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--card);
+  }
+  .catalog-item {
+    position: relative;
+    border: 2px solid var(--border);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    cursor: pointer;
+    transition: var(--transition);
+    background: var(--light);
+    aspect-ratio: 1;
+  }
+  .catalog-item img { width: 100%; height: 100%; object-fit: cover; }
+  .catalog-item.selected { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.2); }
+  .catalog-item .check-mark {
+    position: absolute;
+    top: 5px; left: 5px;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: #fff;
+    display: none;
+    align-items: center; justify-content: center;
+    font-size: 13px;
+    font-weight: bold;
+  }
+  .catalog-item.selected .check-mark { display: flex; }
+  .catalog-item .item-name {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    background: linear-gradient(180deg, transparent, rgba(0,0,0,0.85));
+    color: #fff;
+    font-size: 10px;
+    padding: 12px 4px 4px;
+    text-align: center;
+    line-height: 1.2;
+    height: 40px;
+    overflow: hidden;
+  }
+
+  /* ==== Scrollbar ==== */
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-thumb { background: var(--gray); border-radius: 4px; }
+  ::-webkit-scrollbar-track { background: var(--light); }
+
+  .empty-msg { text-align: center; color: var(--gray); padding: 30px 20px; font-style: italic; }
+
+  /* ==== Media ==== */
+  @media (orientation: landscape) and (max-height: 500px) {
+    .main-menu { grid-template-columns: repeat(3, 1fr); }
+    .menu-btn { padding: 12px 8px; font-size: 12px; }
+    .menu-btn .icon { font-size: 18px; }
+    .app-header h1 { font-size: 18px; }
+  }
+  @media (orientation: portrait) and (max-width: 500px) {
+    .main-menu { grid-template-columns: repeat(2, 1fr); }
+    .app-header h1 { font-size: 19px; }
+  }
+
+  /* ==== Sections ==== */
+  .section-title {
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--primary);
+    margin: 16px 0 8px;
+    display: flex; align-items: center; gap: 6px;
+  }
+
+  .footer-credit {
+    text-align: center;
+    padding: 18px 10px;
+    font-size: 11px;
+    color: var(--gray);
+    line-height: 1.8;
+  }
+  .footer-credit a { color: var(--primary); text-decoration: none; }
+  .footer-credit a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<div id="toastContainer"></div>
+
+<div class="container">
+
+  <!-- صفحه اصلی -->
+  <div id="pageHome" class="page active">
+    <div class="app-header">
+      <div class="header-top">
+        <div>
+          <h1>BlueShade Register</h1>
+          <p class="subtitle">سیستم مدیریت و گزارش‌گیری محصولات</p>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:8px; align-items:flex-end;">
+          <button class="theme-btn" onclick="toggleTheme()" id="themeBtn" title="تغییر تم">🌙</button>
+          <div class="date-badge" id="liveDate">📅 ...</div>
+        </div>
+      </div>
+      <div class="developer-info">
+        👨‍💻 توسعه‌دهنده: <b>مهرداد ربیعی</b> &nbsp;|&nbsp;
+        ✉️ <a href="mailto:mehrdad.rabiei@hotmail.com">mehrdad.rabiei@hotmail.com</a>
+      </div>
+    </div>
+
+    <div class="main-menu">
+      <button class="menu-btn b-manage" onclick="showPage('pageManage')">
+        <span class="icon">⚙️</span><span>مدیریت محصولات</span>
+      </button>
+      <button class="menu-btn b-add" onclick="openAddProductPage()">
+        <span class="icon">➕</span><span>افزودن محصول</span>
+      </button>
+      <button class="menu-btn b-pdf" onclick="openReportPage()">
+        <span class="icon">📄</span><span>گزارش PDF</span>
+      </button>
+      <button class="menu-btn b-catalog" onclick="openCatalogPage()">
+        <span class="icon">📸</span><span>کاتالوگ تصاویر</span>
+      </button>
+      <button class="menu-btn b-excel" onclick="exportExcel()">
+        <span class="icon">📊</span><span>خروجی اکسل</span>
+      </button>
+      <button class="menu-btn b-word" onclick="exportWord()">
+        <span class="icon">📝</span><span>خروجی Word</span>
+      </button>
+      <button class="menu-btn b-backup" onclick="showPage('pageBackup')">
+        <span class="icon">💾</span><span>پشتیبان‌گیری</span>
+      </button>
+      <button class="menu-btn b-exit" onclick="exitApp()">
+        <span class="icon">🚪</span><span>خروج</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- مدیریت محصولات -->
+  <div id="pageManage" class="page">
+    <h1 class="page-title">⚙️ مدیریت محصولات</h1>
+
+    <div class="search-box">
+      <span class="search-icon">🔎</span>
+      <input type="text" id="manageSearch" placeholder="جستجو در نام محصول..." oninput="filterManageList(this.value)" autocomplete="off" />
+      <button class="clear-btn" id="manageClear" onclick="clearManageSearch()">✖</button>
+    </div>
+    <div class="search-result-info" id="manageSearchInfo"></div>
+
+    <div class="product-list" id="productList"></div>
+    <div class="btn-row">
+      <button class="btn btn-back" onclick="showPage('pageHome')">🔙 بازگشت</button>
+    </div>
+  </div>
+
+  <!-- افزودن/ویرایش -->
+  <div id="pageAddProduct" class="page">
+    <h1 class="page-title" id="addProductTitle">➕ افزودن محصول</h1>
+    <div class="form-row">
+      <label>🖼️ تصویر محصول</label>
+      <input type="file" id="fImage" accept="image/*" onchange="previewImage(event)" />
+      <img id="imgPreview" class="img-preview" style="display:none; margin-top:10px;" alt="پیش‌نمایش" />
+    </div>
+    <div class="form-row">
+      <label>نام محصول *</label>
+      <input type="text" id="fName" placeholder="نام محصول" />
+    </div>
+    <div class="form-row">
+      <label>قیمت تولید</label>
+      <input type="number" id="fProdPrice" placeholder="قیمت تولید" />
+    </div>
+    <div class="form-row">
+      <label>قیمت مصرف</label>
+      <input type="number" id="fConsPrice" placeholder="قیمت مصرف" />
+    </div>
+    <div class="form-row">
+      <label>تعداد در کارتن</label>
+      <input type="number" id="fCartonCount" placeholder="تعداد در کارتن" />
+    </div>
+    <div class="form-row">
+      <label>طرح فروش</label>
+      <input type="text" id="fSalePlan" placeholder="طرح فروش" />
+    </div>
+    <div class="form-row">
+      <label>قیمت با طرح</label>
+      <input type="number" id="fDesignPrice" placeholder="قیمت با طرح" />
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-success" onclick="saveProduct()">💾 ذخیره</button>
+      <button class="btn btn-warning" onclick="cancelProductForm()">❌ انصراف</button>
+      <button class="btn btn-back" onclick="showPage('pageHome')">🔙 بازگشت</button>
+    </div>
+  </div>
+
+  <!-- گزارش PDF -->
+  <div id="pageReport" class="page">
+    <h1 class="page-title">📄 گزارش PDF</h1>
+
+    <div class="filter-box">
+      <h3>📅 تاریخ گزارش</h3>
+      <input type="text" id="reportDate" placeholder="1403/01/01" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:8px; font-family:inherit; background:var(--card); color:var(--text);" />
+    </div>
+
+    <div class="filter-box">
+      <h3>🏢 سربرگ ۱ (نام فروشگاه / شرکت)</h3>
+      <input type="text" id="companyName" placeholder="نام فروشگاه یا شرکت" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:8px; font-family:inherit; background:var(--card); color:var(--text);" />
+    </div>
+
+    <div class="filter-box">
+      <h3>🏢 سربرگ ۲ (تلفن)</h3>
+      <input type="text" id="companyPhone" placeholder="شماره تماس" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:8px; font-family:inherit; background:var(--card); color:var(--text);" />
+    </div>
+
+    <div class="filter-box">
+      <h3>🏢 سربرگ ۳ (آدرس)</h3>
+      <input type="text" id="companyAddress" placeholder="آدرس" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:8px; font-family:inherit; background:var(--card); color:var(--text);" />
+    </div>
+
+    <div class="filter-box">
+      <h3>📝 توضیحات ابتدای گزارش</h3>
+      <textarea id="introNote" rows="2" placeholder="متن دلخواه..." style="width:100%; padding:10px; border:1px solid var(--border); border-radius:8px; font-family:inherit; background:var(--card); color:var(--text);"></textarea>
+    </div>
+
+    <div class="filter-box">
+      <h3>📝 توضیحات انتهای گزارش</h3>
+      <textarea id="footerNote" rows="2" placeholder="متن دلخواه..." style="width:100%; padding:10px; border:1px solid var(--border); border-radius:8px; font-family:inherit; background:var(--card); color:var(--text);"></textarea>
+    </div>
+
+    <div class="filter-box">
+      <h3>✍️ با تشکر از...</h3>
+      <input type="text" id="thanksTo" placeholder="مثلاً: مدیریت فروشگاه" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:8px; font-family:inherit; background:var(--card); color:var(--text);" />
+    </div>
+
+    <div class="filter-box">
+      <h3>💰 واحد پول در گزارش</h3>
+      <label><input type="radio" name="currencyUnit" value="toman" checked /> تومان</label>
+      <label><input type="radio" name="currencyUnit" value="rial" /> ریال</label>
+      <label><input type="radio" name="currencyUnit" value="none" /> بدون واحد</label>
+    </div>
+
+    <div class="filter-box">
+      <h3>🔎 فیلتر گزارش‌گیری</h3>
+      <label><input type="radio" name="reportFilter" value="all" checked onchange="toggleProductFilter()" /> گزارش همه</label>
+      <label><input type="radio" name="reportFilter" value="manual" onchange="toggleProductFilter()" /> انتخاب دستی محصولات</label>
+      <div id="productFilterBox" style="display:none; margin-top:8px;">
+        <div class="search-box" style="margin-bottom:6px;">
+          <span class="search-icon">🔎</span>
+          <input type="text" id="reportSearch" placeholder="جستجو در لیست..." oninput="filterReportCheckList(this.value)" />
+        </div>
+        <div class="product-check-list">
+          <div style="margin-bottom:6px;">
+            <label style="font-weight:bold; border-bottom:1px solid var(--border); padding-bottom:6px;">
+              <input type="checkbox" id="selectAllProducts" onchange="toggleAllProducts(this.checked)" /> انتخاب همه
+            </label>
+          </div>
+          <div id="productCheckList"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="filter-box">
+      <h3>📊 ستون‌های نمایش در گزارش</h3>
+      <label><input type="checkbox" class="colCheck" value="prodPrice" checked /> قیمت تولید</label>
+      <label><input type="checkbox" class="colCheck" value="consPrice" checked /> قیمت مصرف</label>
+      <label><input type="checkbox" class="colCheck" value="cartonCount" checked /> تعداد در کارتن</label>
+      <label><input type="checkbox" class="colCheck" value="salePlan" checked /> طرح فروش</label>
+      <label><input type="checkbox" class="colCheck" value="designPrice" checked /> قیمت با طرح</label>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-danger" onclick="generatePDF()">📄 ساخت PDF</button>
+      <button class="btn btn-back" onclick="showPage('pageHome')">🔙 بازگشت</button>
+    </div>
+  </div>
+
+  <!-- کاتالوگ تصاویر -->
+  <div id="pageCatalog" class="page">
+    <h1 class="page-title">📸 کاتالوگ تصاویر</h1>
+
+    <div class="filter-box">
+      <h3>🏢 سربرگ ۱ (نام فروشگاه / شرکت)</h3>
+      <input type="text" id="catCompanyName" placeholder="نام فروشگاه یا شرکت" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:8px; font-family:inherit; background:var(--card); color:var(--text);" />
+    </div>
+    <div class="filter-box">
+      <h3>📅 تاریخ کاتالوگ</h3>
+      <input type="text" id="catDate" placeholder="1403/01/01" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:8px; font-family:inherit; background:var(--card); color:var(--text);" />
+    </div>
+    <div class="filter-box">
+      <h3>📐 چیدمان تصاویر در هر صفحه</h3>
+      <label><input type="radio" name="catGrid" value="2" /> ۲ تصویر (بزرگ)</label>
+      <label><input type="radio" name="catGrid" value="4" checked /> ۴ تصویر</label>
+      <label><input type="radio" name="catGrid" value="6" /> ۶ تصویر</label>
+      <label><input type="radio" name="catGrid" value="9" /> ۹ تصویر</label>
+    </div>
+    <div class="filter-box">
+      <h3>✍️ نوشته زیر هر تصویر</h3>
+      <label><input type="checkbox" id="catShowName" checked /> نمایش نام محصول</label>
+      <label><input type="checkbox" id="catShowPrice" /> نمایش قیمت مصرف</label>
+      <label><input type="checkbox" id="catShowPhone" /> نمایش شماره تماس</label>
+    </div>
+
+    <div class="filter-box">
+      <h3>🖼️ انتخاب تصاویر (فقط محصولات دارای تصویر)</h3>
+      <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px;">
+        <button class="btn btn-info btn-sm" onclick="catalogSelectAll(true)">✅ انتخاب همه</button>
+        <button class="btn btn-secondary btn-sm" onclick="catalogSelectAll(false)">❌ لغو انتخاب</button>
+        <span id="catalogCount" style="align-self:center; font-size:12px; color:var(--gray);">0 انتخاب شده</span>
+      </div>
+      <div class="catalog-grid" id="catalogGrid"></div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-pink" onclick="generateCatalogPDF()">📸 ساخت PDF کاتالوگ</button>
+      <button class="btn btn-back" onclick="showPage('pageHome')">🔙 بازگشت</button>
+    </div>
+  </div>
+
+  <!-- پشتیبان‌گیری -->
+  <div id="pageBackup" class="page">
+    <h1 class="page-title">💾 پشتیبان‌گیری اطلاعات</h1>
+
+    <div class="filter-box">
+      <h3>📤 خروجی (Export)</h3>
+      <p style="font-size:13px; color:var(--gray); margin:0 0 10px;">تمام محصولات + تصاویر را در یک فایل JSON ذخیره کنید.</p>
+      <button class="btn btn-orange" onclick="exportBackup()">💾 دانلود فایل پشتیبان</button>
+    </div>
+
+    <div class="filter-box">
+      <h3>📥 بازیابی (Import)</h3>
+      <p style="font-size:13px; color:var(--gray); margin:0 0 10px;">فایل پشتیبان قبلی را بارگذاری کنید.</p>
+      <input type="file" id="importFile" accept=".json" style="width:100%; padding:8px; border:1px solid var(--border); border-radius:8px; background:var(--card); color:var(--text);" />
+      <div class="btn-row">
+        <button class="btn btn-success" onclick="importBackup()">📥 بازیابی اطلاعات</button>
+      </div>
+    </div>
+
+    <div class="filter-box">
+      <h3>🗑️ پاک کردن همه اطلاعات</h3>
+      <p style="font-size:13px; color:var(--danger); margin:0 0 10px;">هشدار: این عمل قابل بازگشت نیست!</p>
+      <button class="btn btn-danger" onclick="clearAllData()">پاک کردن همه</button>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-back" onclick="showPage('pageHome')">🔙 بازگشت</button>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer-credit">
+    طراحی و توسعه: <b>مهرداد ربیعی</b><br>
+    <a href="mailto:mehrdad.rabiei@hotmail.com">mehrdad.rabiei@hotmail.com</a><br>
+    © BlueShade Register -- <span id="footerYear"></span>
+  </div>
+
+</div>
+
+<!-- مودال تغییر تاریخ -->
+<div class="modal" id="dateModal">
+  <div class="modal-content" style="max-width:380px;">
+    <h3>📅 تغییر تاریخ گزارش</h3>
+    <p style="font-size:13px; color:var(--gray); margin:0 0 10px;">تاریخ مورد نظر را وارد کنید:</p>
+    <input type="text" id="newDate" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:8px; font-family:inherit; background:var(--card); color:var(--text); margin-bottom:12px;" />
+    <div class="btn-row" style="justify-content:flex-end;">
+      <button class="btn btn-secondary" onclick="closeDateModal()">انصراف</button>
+      <button class="btn btn-primary" onclick="confirmDateChange()">تایید</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ================================================================
+   BlueShade Register - v2.0
+   Developer: Mehrdad Rabiei
+   Email: mehrdad.rabiei@hotmail.com
+   ================================================================ */
+
+'use strict';
+
+/* ==================== Utility / Helpers ==================== */
+const $ = (id) => document.getElementById(id);
+const $$ = (sel) => document.querySelectorAll(sel);
+const debounce = (fn, delay = 250) => {
+  let t;
+  return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), delay); };
+};
+const escapeHTML = (str) => String(str ?? '').replace(/[&<>"']/g, c => ({
+  '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+})[c]);
+const escapeRegex = (str) => String(str).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+/* ==================== Toast ==================== */
+function showToast(message, type = 'info', duration = 3000) {
+  try {
+    const container = $('toastContainer');
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
+    toast.textContent = `${icons[type] || ''} ${message}`;
+    container.appendChild(toast);
+    setTimeout(() => {
+      toast.style.transition = 'opacity 0.3s, transform 0.3s';
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateY(-20px)';
+      setTimeout(() => toast.remove(), 300);
+    }, duration);
+  } catch (e) { console.warn('Toast error:', e); }
+}
+
+/* ==================== Safe Runner ==================== */
+function safeRun(fn, label = 'عملیات') {
+  try { return fn(); }
+  catch (err) {
+    console.error(`[${label}]`, err);
+    showToast(`خطا در ${label}: ${err.message || 'نامشخص'}`, 'error', 4000);
+    return null;
+  }
+}
+
+/* ==================== Date Helpers ==================== */
+function getTodayJalali() {
+  try {
+    const now = new Date();
+    const fmt = new Intl.DateTimeFormat('fa-IR-u-ca-persian', {
+      year: 'numeric', month: '2-digit', day: '2-digit'
+    });
+    const parts = fmt.formatToParts(now);
+    const y = parts.find(p => p.type === 'year')?.value || '';
+    const m = parts.find(p => p.type === 'month')?.value || '';
+    const d = parts.find(p => p.type === 'day')?.value || '';
+    return `${y}/${m}/${d}`;
+  } catch (e) {
+    const now = new Date();
+    return `${now.getFullYear()}/${String(now.getMonth()+1).padStart(2,'0')}/${String(now.getDate()).padStart(2,'0')}`;
+  }
+}
+
+function getJalaliWeekday() {
+  try {
+    return new Intl.DateTimeFormat('fa-IR', { weekday: 'long' }).format(new Date());
+  } catch (e) { return ''; }
+}
+
+function updateLiveDate() {
+  try {
+    const el = $('liveDate');
+    if (el) el.textContent = `📅 ${getJalaliWeekday()} ${getTodayJalali()}`;
+  } catch (e) { /* silent */ }
+}
+
+/* ==================== Theme ==================== */
+function toggleTheme() {
+  try {
+    document.body.classList.toggle('dark');
+    const isDark = document.body.classList.contains('dark');
+    $('themeBtn').textContent = isDark ? '☀️' : '🌙';
+    localStorage.setItem('blueShadeTheme', isDark ? 'dark' : 'light');
+  } catch (e) { console.warn(e); }
+}
+
+function loadTheme() {
+  try {
+    if (localStorage.getItem('blueShadeTheme') === 'dark') {
+      document.body.classList.add('dark');
+      $('themeBtn').textContent = '☀️';
+    }
+  } catch (e) { /* silent */ }
+}
+
+/* ==================== Data ==================== */
+const DEFAULT_PRODUCTS = [
+  "مایع ظرفشویی ۳۷۵۰ مولتی اکشن",
+  "مایع دستشویی ۳۵۰۰ بس",
+  "واسع ظرفشویی 1 لیتری مولتی اکشن",
+  "مایع دستشویی 1 لیتری آروما",
+  "شامپو ویتامینه 280",
+  "شامپو ویتامینه 1 لیتری",
+  "شامپو چرب 280",
+  "شامپو چرب 1 لیتری",
+  "شامپو خشک 280",
+  "شامپو خشک 1 لیتری",
+  "شامپو معمولی 280",
+  "شامپو معمولی 1 لیتری",
+  "نرم کننده 250",
+  "نرم کننده 850",
+  "شامپو بدن بس",
+  "شامپو بدن آوند بلوبری 1 لیتری",
+  "شامپو تخم مرغی آوند 1 لیتری",
+  "شامپو آوکادو آوند 1 لیتری",
+  "ژیوانا جنسینگ",
+  "ژیوانا لاوندر",
+  "ژیوانا کافئین",
+  "ژیوانا عسل",
+  "ژیوانا چای سبز",
+  "ژیوانا نرم کننده",
+  "مایع ظرفشویی 10 لیتری",
+  "مایع دستشویی 10 لیتری",
+  "شامپو سر و بدن 10 لیتری",
+  "کرم کاسه ای آوند",
+  "کرم تیوپی آکوا",
+  "کرم پمپی آکوا",
+  "خمیردندان سفید کننده بس",
+  "خمیردندان کامل بس",
+  "خمیردندان بچه موز",
+  "خمیردندان بچه توت فرنگی",
+  "شیشه شور بس",
+  "چند منظوره مولتی اکشن"
+];
+
+let products = [];
+let editingIndex = -1;
+let currentImageData = '';
+let manageFilterText = '';
+
+function makeDefaultProducts() {
+  return DEFAULT_PRODUCTS.map(name => ({
+    name, prodPrice: '', consPrice: '', cartonCount: '',
+    salePlan: '', designPrice: '', image: ''
+  }));
+}
+
+function saveProducts() {
+  try {
+    localStorage.setItem('blueShadeProducts', JSON.stringify(products));
+    return true;
+  } catch (e) {
+    if (e.name === 'QuotaExceededError' || /quota/i.test(e.message)) {
+      showToast('حافظه پر است! لطفاً تصاویر کمتری ذخیره کنید.', 'error', 5000);
+    } else {
+      showToast('خطا در ذخیره‌سازی: ' + e.message, 'error');
+    }
+    return false;
+  }
+}
+
+function loadProducts() {
+  try {
+    const saved = localStorage.getItem('blueShadeProducts');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed)) products = parsed;
+      else products = makeDefaultProducts();
+    } else {
+      products = makeDefaultProducts();
+    }
+  } catch (e) {
+    console.error('loadProducts:', e);
+    products = makeDefaultProducts();
+  }
+}
+
+/* ==================== Navigation ==================== */
+function showPage(id) {
+  try {
+    $$('.page').forEach(p => p.classList.remove('active'));
+    const target = $(id);
+    if (target) target.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } catch (e) { console.warn(e); }
+}
+
+/* ==================== Product List (Manage) ==================== */
+function highlightMatch(text, query) {
+  const safe = escapeHTML(text);
+  if (!query) return safe;
+  try {
+    const re = new RegExp(`(${escapeRegex(query)})`, 'gi');
+    return safe.replace(re, '<mark>$1</mark>');
+  } catch (e) { return safe; }
+}
+
+function renderProductList() {
+  const list = $('productList');
+  if (!list) return;
+  const query = manageFilterText.trim().toLowerCase();
+  const filtered = query
+    ? products.map((p, i) => ({ p, i })).filter(({ p }) => p.name.toLowerCase().includes(query))
+    : products.map((p, i) => ({ p, i }));
+
+  const info = $('manageSearchInfo');
+  if (info) {
+    info.textContent = query
+      ? `${filtered.length} نتیجه از ${products.length} محصول`
+      : `مجموع: ${products.length} محصول`;
+  }
+
+  list.innerHTML = '';
+  if (filtered.length === 0) {
+    list.innerHTML = `<div class="empty-msg">${query ? 'نتیجه‌ای یافت نشد 🔍' : 'هیچ محصولی ثبت نشده است'}</div>`;
+    return;
+  }
+
+  const frag = document.createDocumentFragment();
+  filtered.forEach(({ p, i }) => {
+    const div = document.createElement('div');
+    div.className = 'product-item';
+    const safeName = highlightMatch(p.name, manageFilterText.trim());
+    const imgHtml = p.image
+      ? `<img src="${p.image}" class="product-thumb" alt="" loading="lazy" />`
+      : `<div class="product-thumb-empty">🖼️</div>`;
+    div.innerHTML = `
+      ${imgHtml}
+      <span class="pname" data-idx="${i}">${i + 1}. ${safeName}</span>
+      <button class="btn btn-info btn-sm" data-edit="${i}">✏️</button>
+      <button class="btn btn-danger btn-sm" data-del="${i}">🗑️</button>
+    `;
+    frag.appendChild(div);
+  });
+  list.appendChild(frag);
+}
+
+/* Event delegation برای لیست محصولات */
+document.addEventListener('click', (e) => {
+  const editBtn = e.target.closest('[data-edit]');
+  if (editBtn) { openEditProduct(parseInt(editBtn.dataset.edit)); return; }
+  const delBtn = e.target.closest('[data-del]');
+  if (delBtn) { deleteProduct(parseInt(delBtn.dataset.del)); return; }
+  const nameEl = e.target.closest('.pname[data-idx]');
+  if (nameEl && e.target.tagName !== 'BUTTON') {
+    openEditProduct(parseInt(nameEl.dataset.idx));
+  }
+});
+
+const filterManageList = debounce((val) => {
+  manageFilterText = val || '';
+  const clearBtn = $('manageClear');
+  if (clearBtn) clearBtn.classList.toggle('visible', !!manageFilterText);
+  renderProductList();
+}, 200);
+
+function clearManageSearch() {
+  const inp = $('manageSearch');
+  if (inp) inp.value = '';
+  manageFilterText = '';
+  $('manageClear').classList.remove('visible');
+  renderProductList();
+}
+
+/* ==================== Add / Edit Product ==================== */
+function openAddProductPage() {
+  editingIndex = -1;
+  currentImageData = '';
+  $('addProductTitle').textContent = '➕ افزودن محصول';
+  ['fName','fProdPrice','fConsPrice','fCartonCount','fSalePlan','fDesignPrice'].forEach(id => {
+    const el = $(id); if (el) el.value = '';
+  });
+  const fileInput = $('fImage');
+  if (fileInput) fileInput.value = '';
+  const prev = $('imgPreview');
+  prev.style.display = 'none'; prev.src = '';
+  showPage('pageAddProduct');
+}
+
+function openEditProduct(i) {
+  const p = products[i];
+  if (!p) { showToast('محصول یافت نشد', 'error'); return; }
+  editingIndex = i;
+  currentImageData = p.image || '';
+  $('addProductTitle').textContent = '✏️ ویرایش محصول';
+  $('fName').value = p.name || '';
+  $('fProdPrice').value = p.prodPrice || '';
+  $('fConsPrice').value = p.consPrice || '';
+  $('fCartonCount').value = p.cartonCount || '';
+  $('fSalePlan').value = p.salePlan || '';
+  $('fDesignPrice').value = p.designPrice || '';
+  const fileInput = $('fImage');
+  if (fileInput) fileInput.value = '';
+  const img = $('imgPreview');
+  if (p.image) { img.src = p.image; img.style.display = 'block'; }
+  else { img.style.display = 'none'; img.src = ''; }
+  showPage('pageAddProduct');
+}
+
+function previewImage(event) {
+  const file = event.target.files?.[0];
+  if (!file) return;
+  if (!file.type.startsWith('image/')) {
+    showToast('فقط فایل تصویری مجاز است', 'warning');
+    return;
+  }
+  if (file.size > 10 * 1024 * 1024) {
+    showToast('حجم تصویر بیش از ۱۰ مگابایت است', 'warning');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const img = new Image();
+    img.onload = function() {
+      try {
+        const canvas = document.createElement('canvas');
+        const maxSize = 500;
+        let w = img.width, h = img.height;
+        if (w > h && w > maxSize) { h = h * maxSize / w; w = maxSize; }
+        else if (h > maxSize) { w = w * maxSize / h; h = maxSize; }
+        canvas.width = w; canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        currentImageData = canvas.toDataURL('image/jpeg', 0.75);
+        const preview = $('imgPreview');
+        preview.src = currentImageData;
+        preview.style.display = 'block';
+      } catch (err) {
+        showToast('خطا در پردازش تصویر', 'error');
+        console.error(err);
+      }
+    };
+    img.onerror = () => showToast('خطا در خواندن تصویر', 'error');
+    img.src = e.target.result;
+  };
+  reader.onerror = () => showToast('خطا در خواندن فایل', 'error');
+  reader.readAsDataURL(file);
+}
+
+function saveProduct() {
+  const name = $('fName').value.trim();
+  if (!name) { showToast('نام محصول را وارد کنید', 'warning'); $('fName').focus(); return; }
+
+  const data = {
+    name,
+    prodPrice: $('fProdPrice').value.trim(),
+    consPrice: $('fConsPrice').value.trim(),
+    cartonCount: $('fCartonCount').value.trim(),
+    salePlan: $('fSalePlan').value.trim(),
+    designPrice: $('fDesignPrice').value.trim(),
+    image: currentImageData || ''
+  };
+
+  const snapshot = [...products];
+  if (editingIndex === -1) products.push(data);
+  else products[editingIndex] = data;
+
+  if (!saveProducts()) { products = snapshot; return; }
+  showToast(editingIndex === -1 ? 'محصول جدید ذخیره شد' : 'تغییرات ذخیره شد', 'success');
+  editingIndex = -1;
+  currentImageData = '';
+  renderProductList();
+  showPage('pageManage');
+}
+
+function cancelProductForm() {
+  if (!confirm('از ورود اطلاعات انصراف می‌دهید؟')) return;
+  editingIndex = -1;
+  currentImageData = '';
+  showPage('pageManage');
+}
+
+function deleteProduct(i) {
+  const p = products[i];
+  if (!p) return;
+  if (!confirm(`آیا از حذف محصول «${p.name}» مطمئن هستید؟`)) return;
+  const snapshot = [...products];
+  products.splice(i, 1);
+  if (!saveProducts()) { products = snapshot; return; }
+  showToast('محصول حذف شد', 'success');
+  renderProductList();
+}
+
+/* ==================== Report Page ==================== */
+const reportDateInput = $('reportDate');
+if (reportDateInput) {
+  reportDateInput.value = getTodayJalali();
+  reportDateInput.addEventListener('click', () => {
+    $('newDate').value = reportDateInput.value;
+    $('dateModal').classList.add('active');
+  });
+}
+
+function closeDateModal() { $('dateModal').classList.remove('active'); }
+function confirmDateChange() {
+  const v = $('newDate').value.trim();
+  if (v) reportDateInput.value = v;
+  closeDateModal();
+}
+
+function openReportPage() {
+  if (products.length === 0) { showToast('هیچ محصولی وجود ندارد', 'warning'); return; }
+  renderProductCheckList();
+  showPage('pageReport');
+}
+
+function toggleProductFilter() {
+  const mode = document.querySelector('input[name="reportFilter"]:checked')?.value;
+  $('productFilterBox').style.display = (mode === 'manual') ? 'block' : 'none';
+}
+
+let reportFilterText = '';
+function renderProductCheckList() {
+  const list = $('productCheckList');
+  if (!list) return;
+  const query = reportFilterText.trim().toLowerCase();
+  list.innerHTML = '';
+  const frag = document.createDocumentFragment();
+  products.forEach((p, i) => {
+    if (query && !p.name.toLowerCase().includes(query)) return;
+    const label = document.createElement('label');
+    label.innerHTML = `<input type="checkbox" class="prodCheck" value="${i}" checked /> ${escapeHTML(p.name)}`;
+    frag.appendChild(label);
+  });
+  list.appendChild(frag);
+}
+const filterReportCheckList = debounce((v) => {
+  reportFilterText = v || '';
+  const checked = new Set([...$$('.prodCheck')].filter(c => c.checked).map(c => c.value));
+  renderProductCheckList();
+  $$('.prodCheck').forEach(c => { if (checked.has(c.value)) c.checked = true; });
+}, 200);
+
+function toggleAllProducts(checked) {
+  $$('.prodCheck').forEach(c => c.checked = checked);
+}
+
+function getSelectedProductsForReport() {
+  const mode = document.querySelector('input[name="reportFilter"]:checked')?.value;
+  if (mode === 'all') return products.map((_, i) => i);
+  const selected = [];
+  $$('.prodCheck').forEach(c => { if (c.checked) selected.push(parseInt(c.value)); });
+  return selected;
+}
+
+function getSelectedColumns() {
+  const cols = [];
+  $$('.colCheck').forEach(c => { if (c.checked) cols.push(c.value); });
+  return cols;
+}
+
+function getCurrencyUnit() {
+  const r = document.querySelector('input[name="currencyUnit"]:checked');
+  return r ? r.value : 'toman';
+}
+
+function formatPrice(val, unit) {
+  if (val === '' || val === null || val === undefined || val === '-') return '-';
+  const num = Number(String(val).replace(/,/g, ''));
+  if (isNaN(num)) return String(val);
+  const formatted = num.toLocaleString('en-US');
+  if (unit === 'toman') return formatted + ' تومان';
+  if (unit === 'rial') return formatted + ' ریال';
+  return formatted;
+}
+
+/* ==================== Persian Font for PDF ==================== */
+let cachedFontBase64 = null;
+async function loadPersianFont(doc) {
+  try {
+    if (!cachedFontBase64) {
+      const url = 'https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/fonts/ttf/Vazirmatn-Bold.ttf';
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('Font fetch failed');
+      const buf = await res.arrayBuffer();
+      const bytes = new Uint8Array(buf);
+      let binary = '';
+      const chunk = 0x8000;
+      for (let i = 0; i < bytes.length; i += chunk) {
+        binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
+      }
+      cachedFontBase64 = btoa(binary);
+    }
+    doc.addFileToVFS('Vazirmatn-Bold.ttf', cachedFontBase64);
+    doc.addFont('Vazirmatn-Bold.ttf', 'Vazirmatn', 'bold');
+    return true;
+  } catch (e) {
+    console.warn('Font load failed, fallback to helvetica:', e);
+    return false;
+  }
+}
+
+/* ==================== PDF Report ==================== */
+async function generatePDF() {
+  try {
+    const indices = getSelectedProductsForReport();
+    if (indices.length === 0) { showToast('هیچ محصولی برای گزارش انتخاب نشده', 'warning'); return; }
+    const selectedCols = getSelectedColumns();
+    if (selectedCols.length === 0) { showToast('حداقل یک ستون انتخاب کنید', 'warning'); return; }
+
+    showToast('در حال ساخت PDF...', 'info', 1500);
+
+    const companyName = $('companyName').value.trim();
+    const companyPhone = $('companyPhone').value.trim();
+    const companyAddress = $('companyAddress').value.trim();
+    const introNote = $('introNote').value.trim();
+    const footerNote = $('footerNote').value.trim();
+    const thanksTo = $('thanksTo').value.trim();
+    const reportDate = reportDateInput.value;
+    const currencyUnit = getCurrencyUnit();
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF('p', 'mm', 'a4');
+    const fontLoaded = await loadPersianFont(doc);
+    const fontName = fontLoaded ? 'Vazirmatn' : 'helvetica';
+    const T = (fa, en) => fontLoaded ? fa : en;
+
+    const pageWidth = 210;
+    const pageHeight = 297;
+    const margin = 10;
+
+    const colMap = {
+      prodPrice: 'قیمت تولید',
+      consPrice: 'قیمت مصرف',
+      cartonCount: 'تعداد در کارتن',
+      salePlan: 'طرح فروش',
+      designPrice: 'قیمت با طرح'
+    };
+
+    const headers = ['ردیف', 'نام محصول'];
+    selectedCols.forEach(c => headers.push(colMap[c]));
+
+    const tableX = margin;
+    const tableWidth = pageWidth - 2 * margin;
+    const colCount = headers.length;
+
+    let ratios;
+    if (colCount === 2) ratios = [0.15, 0.85];
+    else if (colCount === 3) ratios = [0.12, 0.58, 0.30];
+    else if (colCount === 4) ratios = [0.10, 0.50, 0.20, 0.20];
+    else if (colCount === 5) ratios = [0.09, 0.43, 0.16, 0.16, 0.16];
+    else if (colCount === 6) ratios = [0.08, 0.38, 0.135, 0.135, 0.135, 0.135];
+    else ratios = headers.map((_, i) => i === 0 ? 0.08 : (i === 1 ? 0.34 : (0.58 / (headers.length - 2))));
+    const sum = ratios.reduce((a, b) => a + b, 0);
+    ratios = ratios.map(r => r / sum);
+
+    const colWidths = ratios.map(r => r * tableWidth);
+    const colX = [tableX];
+    for (let i = 0; i < colWidths.length - 1; i++) colX.push(colX[i] + colWidths[i]);
+
+    const rowHeight = 9;
+    const headerHeight = 10;
+    const boxX = margin - 5, boxY = margin - 5;
+    const boxW = pageWidth - 2 * boxX, boxH = pageHeight - 2 * boxY;
+
+    function drawBox() {
+      doc.setDrawColor(0); doc.setLineWidth(0.6);
+      doc.rect(boxX, boxY, boxW, boxH);
+    }
+
+    function drawTableHeader(yPos) {
+      doc.setFillColor(26, 58, 107);
+      doc.rect(tableX, yPos, tableWidth, headerHeight, 'F');
+      doc.setFont(fontName, 'bold'); doc.setFontSize(9);
+      doc.setTextColor(255, 255, 255);
+      headers.forEach((h, i) => {
+        doc.text(h, colX[i] + colWidths[i] / 2, yPos + headerHeight / 2 + 1.2, { align: 'center' });
+      });
+      doc.setDrawColor(0); doc.setLineWidth(0.3);
+      doc.rect(tableX, yPos, tableWidth, headerHeight);
+      for (let i = 1; i < colX.length; i++) doc.line(colX[i], yPos, colX[i], yPos + headerHeight);
+      doc.setTextColor(0, 0, 0);
+    }
+
+    drawBox();
+    doc.setFont(fontName, 'bold'); doc.setFontSize(11); doc.setTextColor(0, 0, 0);
+    doc.text(T('تاریخ: ', 'Date: ') + reportDate, margin, margin + 4);
+
+    let y = margin + 12;
+    if (companyName) { doc.setFontSize(16); doc.text(companyName, pageWidth / 2, y, { align: 'center' }); y += 7; }
+    doc.setFontSize(10);
+    if (companyPhone) { doc.text(companyPhone, pageWidth / 2, y, { align: 'center' }); y += 5; }
+    if (companyAddress) { doc.text(companyAddress, pageWidth / 2, y, { align: 'center' }); y += 5; }
+
+    y += 2;
+    doc.setDrawColor(0, 123, 255); doc.setLineWidth(0.5);
+    doc.line(margin, y, pageWidth - margin, y);
+    y += 4;
+
+    if (introNote) {
+      doc.setFontSize(10); doc.setTextColor(40, 40, 40);
+      doc.splitTextToSize(introNote, pageWidth - 2 * margin).forEach(line => {
+        doc.text(line, pageWidth - margin, y, { align: 'right' }); y += 5;
+      });
+      y += 2;
+    }
+
+    drawTableHeader(y);
+    y += headerHeight;
+
+    indices.forEach((prodIdx, idx) => {
+      if (y + rowHeight > pageHeight - 30) {
+        doc.addPage(); drawBox();
+        doc.setFont(fontName, 'bold'); doc.setFontSize(10);
+        doc.text(T('تاریخ: ', 'Date: ') + reportDate, margin, margin + 4);
+        y = margin + 10;
+        drawTableHeader(y);
+        y += headerHeight;
+      }
+
+      const p = products[prodIdx];
+      const values = [String(idx + 1), p.name];
+      selectedCols.forEach(c => {
+        let v = p[c] || '-';
+        if (['prodPrice', 'consPrice', 'designPrice'].includes(c)) {
+          v = formatPrice(v, currencyUnit);
+        } else if (v !== '-' && v !== '' && !isNaN(v)) {
+          v = Number(v).toLocaleString('en-US');
+        }
+        values.push(v);
+      });
+
+      if (idx % 2 === 1) {
+        doc.setFillColor(245, 245, 245);
+        doc.rect(tableX, y, tableWidth, rowHeight, 'F');
+      }
+      doc.setDrawColor(0); doc.setLineWidth(0.2);
+      doc.rect(tableX, y, tableWidth, rowHeight);
+
+      doc.setFont(fontName, 'bold');
+      values.forEach((v, i) => {
+        const text = String(v);
+        let fs = 9;
+        if (i === 1) {
+          if (text.length > 30) fs = 7; else if (text.length > 22) fs = 8;
+        } else {
+          if (text.length > 20) fs = 7; else if (text.length > 15) fs = 8;
+        }
+        doc.setFontSize(fs);
+        doc.text(text, colX[i] + colWidths[i] / 2, y + rowHeight / 2 + 1.2, { align: 'center', maxWidth: colWidths[i] - 1 });
+      });
+
+      for (let i = 1; i < colX.length; i++) doc.line(colX[i], y, colX[i], y + rowHeight);
+      y += rowHeight;
+    });
+
+    if (footerNote) {
+      let footerY = y + 8;
+      if (footerY > pageHeight - 30) {
+        doc.addPage(); drawBox();
+        footerY = margin + 15;
+      }
+      doc.setDrawColor(200); doc.setLineWidth(0.3);
+      doc.line(margin, footerY - 4, pageWidth - margin, footerY - 4);
+      doc.setFont(fontName, 'bold'); doc.setFontSize(10); doc.setTextColor(40, 40, 40);
+      doc.splitTextToSize(footerNote, pageWidth - 2 * margin).forEach(line => {
+        doc.text(line, pageWidth - margin, footerY, { align: 'right' });
+        footerY += 5;
+      });
+    }
+
+    const totalPages = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= totalPages; i++) {
+      doc.setPage(i);
+      doc.setFont(fontName, 'bold'); doc.setFontSize(10); doc.setTextColor(0, 0, 0);
+      doc.text(T('صفحه ', 'Page ') + i + ' / ' + totalPages, pageWidth - margin, margin + 4, { align: 'right' });
+      doc.setFontSize(9); doc.setTextColor(80, 80, 80);
+      doc.text(T('صفحه ', 'Page ') + i + T(' از ', ' of ') + totalPages, pageWidth / 2, pageHeight - margin + 2, { align: 'center' });
+    }
+
+    doc.setPage(totalPages);
+    doc.setFont(fontName, 'bold'); doc.setFontSize(11); doc.setTextColor(0, 0, 0);
+    const thanksText = thanksTo ? T('با تشکر از ', 'With thanks to ') + thanksTo : T('با تشکر', 'With thanks');
+    doc.text(thanksText, margin + 2, pageHeight - margin - 3);
+
+    doc.save('BlueShade-Report-' + Date.now() + '.pdf');
+    showToast('PDF با موفقیت ساخته شد', 'success');
+  } catch (err) {
+    console.error(err);
+    showToast('خطا در ساخت PDF: ' + err.message, 'error', 5000);
+  }
+}
+
+/* ==================== Catalog PDF ==================== */
+let catalogSelection = new Set();
+
+function openCatalogPage() {
+  const withImage = products.filter(p => p.image);
+  if (withImage.length === 0) {
+    showToast('هیچ محصولی دارای تصویر نیست', 'warning');
+    return;
+  }
+  $('catDate').value = getTodayJalali();
+  catalogSelection.clear();
+  // پیش‌فرض همه انتخاب
+  products.forEach((p, i) => { if (p.image) catalogSelection.add(i); });
+  renderCatalogGrid();
+  showPage('pageCatalog');
+}
+
+function renderCatalogGrid() {
+  const grid = $('catalogGrid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  const frag = document.createDocumentFragment();
+  products.forEach((p, i) => {
+    if (!p.image) return;
+    const div = document.createElement('div');
+    div.className = 'catalog-item' + (catalogSelection.has(i) ? ' selected' : '');
+    div.dataset.idx = i;
+    div.innerHTML = `
+      <img src="${p.image}" alt="" loading="lazy" />
+      <div class="check-mark">✓</div>
+      <div class="item-name">${escapeHTML(p.name)}</div>
+    `;
+    frag.appendChild(div);
+  });
+  grid.appendChild(frag);
+  updateCatalogCount();
+}
+
+function updateCatalogCount() {
+  const el = $('catalogCount');
+  if (el) el.textContent = `${catalogSelection.size} انتخاب شده`;
+}
+
+document.addEventListener('click', (e) => {
+  const item = e.target.closest('.catalog-item');
+  if (!item) return;
+  const idx = parseInt(item.dataset.idx);
+  if (catalogSelection.has(idx)) catalogSelection.delete(idx);
+  else catalogSelection.add(idx);
+  item.classList.toggle('selected');
+  updateCatalogCount();
+});
+
+function catalogSelectAll(select) {
+  catalogSelection.clear();
+  if (select) products.forEach((p, i) => { if (p.image) catalogSelection.add(i); });
+  renderCatalogGrid();
+}
+
+async function generateCatalogPDF() {
+  try {
+    if (catalogSelection.size === 0) {
+      showToast('حداقل یک تصویر انتخاب کنید', 'warning');
+      return;
+    }
+    showToast('در حال ساخت کاتالوگ...', 'info', 1500);
+
+    const companyName = $('catCompanyName').value.trim();
+    const catDate = $('catDate').value.trim();
+    const gridSize = parseInt(document.querySelector('input[name="catGrid"]:checked')?.value || '4');
+    const showName = $('catShowName').checked;
+    const showPrice = $('catShowPrice').checked;
+    const showPhone = $('catShowPhone').checked;
+    const currencyUnit = getCurrencyUnit();
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF('p', 'mm', 'a4');
+    const fontLoaded = await loadPersianFont(doc);
+    const fontName = fontLoaded ? 'Vazirmatn' : 'helvetica';
+    const T = (fa, en) => fontLoaded ? fa : en;
+
+    const pageWidth = 210, pageHeight = 297;
+    const margin = 10;
+    const boxX = margin - 5, boxY = margin - 5;
+    const boxW = pageWidth - 2 * boxX, boxH = pageHeight - 2 * boxY;
+
+    // ابعاد شبکه
+    const cols = gridSize === 2 ? 1 : (gridSize === 4 ? 2 : (gridSize === 6 ? 2 : 3));
+    const rows = gridSize === 2 ? 2 : (gridSize === 4 ? 2 : (gridSize === 6 ? 3 : 3));
+    const cellGap = 4;
+    const contentTop = margin + 22; // فاصله سربرگ
+    const contentBottom = pageHeight - margin - 10;
+    const contentWidth = pageWidth - 2 * margin;
+    const contentHeight = contentBottom - contentTop;
+    const cellW = (contentWidth - (cols - 1) * cellGap) / cols;
+    const cellH = (contentHeight - (rows - 1) * cellGap) / rows;
+    const imgPadding = 2;
+
+    const selectedList = products
+      .map((p, i) => ({ p, i }))
+      .filter(({ i }) => catalogSelection.has(i));
+
+    function drawBox() {
+      doc.setDrawColor(0); doc.setLineWidth(0.6);
+      doc.rect(boxX, boxY, boxW, boxH);
+    }
+
+    function drawHeader() {
+      doc.setFont(fontName, 'bold'); doc.setFontSize(11); doc.setTextColor(0);
+      doc.text(T('تاریخ: ', 'Date: ') + catDate, margin, margin + 4);
+
+      let y = margin + 12;
+      if (companyName) {
+        doc.setFontSize(16);
+        doc.text(companyName, pageWidth / 2, y, { align: 'center' });
+        y += 6;
+      }
+      doc.setFontSize(11);
+      doc.setTextColor(37, 99, 235);
+      doc.text(T('کاتالوگ محصولات', 'Product Catalog'), pageWidth / 2, y, { align: 'center' });
+      doc.setTextColor(0);
+      doc.setDrawColor(37, 99, 235); doc.setLineWidth(0.5);
+      doc.line(margin, y + 3, pageWidth - margin, y + 3);
+    }
+
+    drawBox();
+    drawHeader();
+
+    let cellIndex = 0;
+    let pageIndex = 0;
+
+    for (let s = 0; s < selectedList.length; s++) {
+      const { p } = selectedList[s];
+      const slotInPage = cellIndex % (cols * rows);
+
+      if (slotInPage === 0 && cellIndex !== 0) {
+        doc.addPage(); pageIndex++;
+        drawBox(); drawHeader();
+      }
+
+      const gridPos = slotInPage;
+      const col = gridPos % cols;
+      const row = Math.floor(gridPos / cols);
+
+      const x = margin + col * (cellW + cellGap);
+      const y = contentTop + row * (cellH + cellGap);
+
+      // کادر سلول
+      doc.setDrawColor(200); doc.setLineWidth(0.3);
+      doc.rect(x, y, cellW, cellH);
+
+      // تصویر
+      try {
+        const imgProps = doc.getImageProperties(p.image);
+        const availW = cellW - 2 * imgPadding;
+        const availH = cellH - 2 * imgPadding - (showName || showPrice ? 12 : 0) - (showPhone ? 6 : 0);
+        const ratio = Math.min(availW / imgProps.width, availH / imgProps.height);
+        const drawW = imgProps.width * ratio;
+        const drawH = imgProps.height * ratio;
+        const drawX = x + (cellW - drawW) / 2;
+        const drawY = y + imgPadding + (availH - drawH) / 2;
+        doc.addImage(p.image, 'JPEG', drawX, drawY, drawW, drawH);
+      } catch (err) {
+        console.warn('Image add failed:', err);
+        doc.setFontSize(9);
+        doc.text(T('خطا در تصویر', 'Image error'), x + cellW / 2, y + cellH / 2, { align: 'center' });
+      }
+
+      // متن زیر تصویر
+      let textY = y + cellH - 2;
+      doc.setFont(fontName, 'bold');
+      if (showPhone && showPrice) {
+        const priceText = formatPrice(p.consPrice || '-', currencyUnit);
+        doc.setFontSize(8); doc.setTextColor(100);
+        doc.text(priceText, x + cellW / 2, textY, { align: 'center', maxWidth: cellW - 2 });
+        textY -= 4;
+      } else if (showPrice) {
+        const priceText = formatPrice(p.consPrice || '-', currencyUnit);
+        doc.setFontSize(8); doc.setTextColor(100);
+        doc.text(priceText, x + cellW / 2, textY, { align: 'center', maxWidth: cellW - 2 });
+        textY -= 4;
+      }
+      if (showPhone) {
+        const phone = $('companyPhone')?.value.trim() || '';
+        if (phone) {
+          doc.setFontSize(7); doc.setTextColor(120);
+          doc.text(T('تماس: ', 'Tel: ') + phone, x + cellW / 2, textY, { align: 'center', maxWidth: cellW - 2 });
+          textY -= 4;
+        }
+      }
+      if (showName) {
+        doc.setFontSize(8); doc.setTextColor(0);
+        const nameLines = doc.splitTextToSize(p.name, cellW - 3);
+        const shown = nameLines.slice(0, 2);
+        shown.forEach((line, li) => {
+          doc.text(line, x + cellW / 2, textY - (shown.length - 1 - li) * 3.5, { align: 'center' });
+        });
+      }
+
+      cellIndex++;
+    }
+
+    // شماره‌گذاری صفحات
+    const totalPages = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= totalPages; i++) {
+      doc.setPage(i);
+      doc.setFont(fontName, 'bold'); doc.setFontSize(9); doc.setTextColor(80);
+      doc.text(T('صفحه ', 'Page ') + i + T(' از ', ' of ') + totalPages, pageWidth / 2, pageHeight - margin + 2, { align: 'center' });
+    }
+
+    // با تشکر
+    doc.setPage(totalPages);
+    doc.setFont(fontName, 'bold'); doc.setFontSize(10); doc.setTextColor(0);
+    doc.text(T('BlueShade Register - مهرداد ربیعی', 'BlueShade Register - Mehrdad Rabiei'), margin + 2, pageHeight - margin - 2);
+
+    doc.save('BlueShade-Catalog-' + Date.now() + '.pdf');
+    showToast('کاتالوگ با موفقیت ساخته شد', 'success');
+  } catch (err) {
+    console.error(err);
+    showToast('خطا در ساخت کاتالوگ: ' + err.message, 'error', 5000);
+  }
+}
+
+/* ==================== Word Export ==================== */
+function exportWord() {
+  try {
+    if (products.length === 0) { showToast('هیچ محصولی وجود ندارد', 'warning'); return; }
+    const companyName = $('companyName').value.trim();
+    const reportDate = reportDateInput.value;
+    const thanksTo = $('thanksTo').value.trim();
+    const thanksText = thanksTo ? 'با تشکر از ' + thanksTo : 'با تشکر';
+    const currencyUnit = getCurrencyUnit();
+
+    let html = `
+      <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+      <head><meta charset="utf-8"><title>BlueShade Register</title>
+      <style>
+        body { font-family: Tahoma, Vazirmatn, sans-serif; direction: rtl; padding: 20px; }
+        h1 { text-align: center; color: #1a3a6b; }
+        .date { text-align: left; font-weight: bold; margin-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #333; padding: 6px; text-align: center; font-size: 12px; }
+        th { background: #1a3a6b; color: #fff; }
+        .footer { margin-top: 30px; text-align: left; font-weight: bold; }
+      </style></head><body>
+      <div class="date">تاریخ: ${escapeHTML(reportDate)}</div>
+      <h1>${escapeHTML(companyName || 'BlueShade Register')}</h1>
+      <table>
+        <thead><tr>
+          <th>ردیف</th><th>نام محصول</th>
+          <th>قیمت تولید</th><th>قیمت مصرف</th>
+          <th>تعداد در کارتن</th><th>طرح فروش</th><th>قیمت با طرح</th>
+        </tr></thead><tbody>
+    `;
+
+    products.forEach((p, i) => {
+      html += `<tr>
+        <td>${i + 1}</td>
+        <td>${escapeHTML(p.name)}</td>
+        <td>${formatPrice(p.prodPrice, currencyUnit)}</td>
+        <td>${formatPrice(p.consPrice, currencyUnit)}</td>
+        <td>${escapeHTML(p.cartonCount || '-')}</td>
+        <td>${escapeHTML(p.salePlan || '-')}</td>
+        <td>${formatPrice(p.designPrice, currencyUnit)}</td>
+      </tr>`;
+    });
+
+    html += `</tbody></table><div class="footer">${escapeHTML(thanksText)}</div>
+      <p style="text-align:center; color:#888; font-size:10px; margin-top:30px;">
+        BlueShade Register -- مهرداد ربیعی -- mehrdad.rabiei@hotmail.com
+      </p></body></html>`;
+
+    const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'BlueShade-Report-' + Date.now() + '.doc';
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('فایل Word دانلود شد', 'success');
+  } catch (err) {
+    console.error(err);
+    showToast('خطا در خروجی Word: ' + err.message, 'error');
+  }
+}
+
+/* ==================== Excel Export ==================== */
+function exportExcel() {
+  try {
+    if (products.length === 0) { showToast('هیچ محصولی وجود ندارد', 'warning'); return; }
+    const currencyUnit = getCurrencyUnit();
+    const data = [['ردیف','نام محصول','قیمت تولید','قیمت مصرف','تعداد در کارتن','طرح فروش','قیمت با طرح']];
+    products.forEach((p, i) => {
+      data.push([
+        i + 1,
+        p.name,
+        formatPrice(p.prodPrice, currencyUnit),
+        formatPrice(p.consPrice, currencyUnit),
+        p.cartonCount || '-',
+        p.salePlan || '-',
+        formatPrice(p.designPrice, currencyUnit)
+      ]);
+    });
+    const ws = XLSX.utils.aoa_to_sheet(data);
+    ws['!cols'] = [{wch:6},{wch:32},{wch:18},{wch:18},{wch:14},{wch:16},{wch:18}];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'BlueShade');
+    XLSX.writeFile(wb, 'BlueShade-Report-' + Date.now() + '.xlsx');
+    showToast('فایل Excel دانلود شد', 'success');
+  } catch (err) {
+    console.error(err);
+    showToast('خطا در خروجی Excel: ' + err.message, 'error');
+  }
+}
+
+/* ==================== Backup ==================== */
+function exportBackup() {
+  try {
+    if (products.length === 0) { showToast('اطلاعاتی برای پشتیبان‌گیری وجود ندارد', 'warning'); return; }
+    const backup = {
+      version: '2.0',
+      developer: 'Mehrdad Rabiei',
+      email: 'mehrdad.rabiei@hotmail.com',
+      date: new Date().toISOString(),
+      products
+    };
+    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'BlueShade-Backup-' + Date.now() + '.json';
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('فایل پشتیبان دانلود شد', 'success');
+  } catch (err) {
+    console.error(err);
+    showToast('خطا در پشتیبان‌گیری: ' + err.message, 'error');
+  }
+}
+
+function importBackup() {
+  const file = $('importFile').files?.[0];
+  if (!file) { showToast('فایلی انتخاب نشده', 'warning'); return; }
+  if (!confirm('اطلاعات فعلی جایگزین می‌شود. مطمئن هستید؟')) return;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (data.products && Array.isArray(data.products)) {
+        products = data.products;
+        saveProducts();
+        renderProductList();
+        showToast(`بازیابی موفق (${products.length} محصول)`, 'success');
+        showPage('pageHome');
+      } else {
+        showToast('فرمت فایل نامعتبر است', 'error');
+      }
+    } catch (err) {
+      console.error(err);
+      showToast('خطا در خواندن فایل: ' + err.message, 'error');
+    }
+  };
+  reader.onerror = () => showToast('خطا در خواندن فایل', 'error');
+  reader.readAsText(file);
+}
+
+function clearAllData() {
+  if (!confirm('همه محصولات حذف شوند؟ این عمل قابل بازگشت نیست!')) return;
+  if (!confirm('مطمئن هستید؟؟')) return;
+  products = makeDefaultProducts();
+  saveProducts();
+  renderProductList();
+  showToast('اطلاعات بازنشانی شد', 'success');
+  showPage('pageHome');
+}
+
+/* ==================== Exit ==================== */
+function exitApp() {
+  if (!confirm('آیا می‌خواهید از برنامه خارج شوید؟')) return;
+  try { window.close(); } catch (e) { /* ignore */ }
+  document.body.innerHTML = `
+    <div style="text-align:center; padding:60px 20px; font-family:Vazirmatn,Tahoma; direction:rtl;">
+      <h2 style="color:#2563eb;">BlueShade Register</h2>
+      <p style="color:#64748b;">از برنامه خارج شدید.</p>
+      <p style="font-size:12px; color:#94a3b8; margin-top:24px;">
+        توسعه‌دهنده: مهرداد ربیعی<br>mehrdad.rabiei@hotmail.com
+      </p>
+    </div>`;
+}
+
+/* ==================== Init ==================== */
+function init() {
+  try {
+    loadTheme();
+    updateLiveDate();
+    setInterval(updateLiveDate, 60 * 1000);
+    loadProducts();
+    renderProductList();
+    const yearEl = $('footerYear');
+    if (yearEl) yearEl.textContent = new Date().getFullYear();
+  } catch (e) {
+    console.error('Init error:', e);
+    showToast('خطا در راه‌اندازی برنامه', 'error');
+  }
+}
+
+/* global error handler */
+window.addEventListener('error', (e) => {
+  console.error('Global error:', e.error || e.message);
+});
+window.addEventListener('unhandledrejection', (e) => {
+  console.error('Unhandled promise rejection:', e.reason);
+});
+
+document.addEventListener('DOMContentLoaded', init);
+if (document.readyState !== 'loading') init();
+</script>
+
+</body>
+</html>
